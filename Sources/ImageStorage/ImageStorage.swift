@@ -4,11 +4,11 @@ public struct ImageStorage : Sendable {
     let imagesFolderName = "images"
     let fileExtension = ".png"
     
-    func save(_ id: UUID, _ data: Data) throws {
+    public func save(_ id: UUID, _ data: Data) throws {
         try saveInternal(id, data, inFolder: imagesFolderName)
     }
     
-    func get(_ id: UUID) -> Data {
+    public func get(_ id: UUID) -> Data {
         return getInternal(id, inFolder: imagesFolderName)
     }
     
@@ -46,7 +46,7 @@ public struct ImageStorage : Sendable {
         }
     }
     
-    func getPath(_ id: UUID) -> String {
+    public func getPath(_ id: UUID) -> String {
         let fileManager = FileManager.default
         
         if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
@@ -60,7 +60,7 @@ public struct ImageStorage : Sendable {
         return ""
     }
     
-    func remove(_ id: UUID) throws {
+    public func remove(_ id: UUID) throws {
         try removeInternal(id, fromFolder: imagesFolderName)
     }
     
