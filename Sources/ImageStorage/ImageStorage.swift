@@ -4,6 +4,8 @@ public struct ImageStorage : Sendable {
     let imagesFolderName = "images"
     let fileExtension = ".png"
     
+    public init() {}
+    
     public func save(_ id: UUID, _ data: Data) throws {
         try saveInternal(id, data, inFolder: imagesFolderName)
     }
