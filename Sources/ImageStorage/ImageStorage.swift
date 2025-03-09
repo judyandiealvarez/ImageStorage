@@ -1,2 +1,80 @@
-// The Swift Programming Language
-// https://docs.swift.org/swift-book
+import Foundation
+
+public struct ImageStorage : Sendable {
+    let imagesFolderName = "images"
+    let fileExtension = ".png"
+    
+    func save(_ id: UUID, _ data: Data) throws {
+        try saveInternal(id, data, inFolder: imagesFolderName)
+    }
+    
+    func get(_ id: UUID) -> Data {
+        return getInternal(id, inFolder: imagesFolderName)
+    }
+    
+    func getInternal(_ id: UUID, inFolder folderName: String) -> Data {
+        let fileManager = FileManager.default
+        
+        if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            do {
+                let folderURL = documentsDirectory.appendingPathComponent(folderName)
+                try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
+                let filename = id.uuidString + fileExtension
+                let fileURL = folderURL.appendingPathComponent(filename)
+                
+                let data = try Data(contentsOf: fileURL)
+                
+                return data
+            }
+            catch let error {
+                fatalError(error.localizedDescription)
+            }
+        }
+        
+        return Data()
+    }
+    
+    func saveInternal(_ id: UUID, _ data: Data, inFolder folderName: String) throws {
+        let fileManager = FileManager.default
+        
+        if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let folderURL = documentsDirectory.appendingPathComponent(folderName)
+            try fileManager.createDirectory(at: folderURL, withIntermediateDirectories: true, attributes: nil)
+            let filename = id.uuidString + fileExtension
+            let fileURL = folderURL.appendingPathComponent(filename)
+            try data.write(to: fileURL)
+        }
+    }
+    
+    func getPath(_ id: UUID) -> String {
+        let fileManager = FileManager.default
+        
+        if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let folderURL = documentsDirectory.appendingPathComponent(imagesFolderName)
+            let filename = id.uuidString + fileExtension
+            let fileURL = folderURL.appendingPathComponent(filename)
+            
+            return fileURL.absoluteString
+        }
+        
+        return ""
+    }
+    
+    func remove(_ id: UUID) throws {
+        try removeInternal(id, fromFolder: imagesFolderName)
+    }
+    
+    func removeInternal(_ id: UUID, fromFolder folderName: String) throws {
+        let fileManager = FileManager.default
+        
+        if let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first {
+            let folderURL = documentsDirectory.appendingPathComponent(folderName)
+            let filename = id.uuidString + fileExtension
+            let fileURL = folderURL.appendingPathComponent(filename)
+            
+            if fileManager.fileExists(atPath: fileURL.path) {
+                try fileManager.removeItem(at: fileURL)
+            }
+        }
+    }
+}
